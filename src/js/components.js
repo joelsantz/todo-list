@@ -1,16 +1,37 @@
-import '../css/components.css';
-// import webpacklogo from '../assets/img/webpack-logo.png';
+import { Todo } from "../classes";
+import { todoList } from "../index";
 
-export const saludar = ( nombre ) => {
-    console.log("Creando etiqueta h1");
+// HTML References
+const divTodoList = document.querySelector('.todo-list');
+const txtInput = document.querySelector('.new-todo');
 
-    const h1 = document.createElement('h1');
-    h1.innerText = `Hola, ${nombre}!`;
+export const createTodoHtml = ( task ) => {
 
-    document.body.append(h1);
+    const htmlTask = `
+    <li class="${ (task.complete) ? 'completed' : ''}" data-id="${task.idTask}">
+        <div class="view">
+            <input class="toggle" type="checkbox" ${ (task.complete) ? 'checked' : '' }>
+            <label>${task.task}</label>
+            <button class="destroy"></button>
+        </div>
+        <input class="edit" value="Create a TodoMVC template">
+    </li>`;
+    const div = document.createElement('div');
+    div.innerHTML = htmlTask;
 
-    //img
-    // const img = document.createElement('img');
-    // img.src = webpacklogo;
-    // document.body.append(img);
+    divTodoList.append( div.firstElementChild );
+
+    return div.firstElementChild;
+
 }
+
+// Events
+txtInput.addEventListener('keyup', (event) => {
+    if( event.keyCode === 13 && txtInput.value.length > 0) {
+        console.log(txtInput.value);
+        const newTask = new Todo(txtInput.value);
+        todoList.newTodo(newTask);
+        createTodoHtml( newTask );
+        txtInput.value = '';
+    }
+});
