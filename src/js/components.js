@@ -4,6 +4,9 @@ import { todoList } from "../index";
 // HTML References
 const divTodoList = document.querySelector('.todo-list');
 const txtInput = document.querySelector('.new-todo');
+const buttonCompleted = document.querySelector('.clear-completed');
+const ulFilters = document.querySelector('.filters');
+const anchorFilters = document.querySelectorAll('.filtro');
 
 export const createTodoHtml = ( task ) => {
 
@@ -33,5 +36,57 @@ txtInput.addEventListener('keyup', (event) => {
         todoList.newTodo(newTask);
         createTodoHtml( newTask );
         txtInput.value = '';
+    }
+});
+
+divTodoList.addEventListener('click', (event) => {
+    const elementName = event.target.localName;  //input, label, button
+    const todoElement = event.target.parentElement.parentElement;
+    const idTodo = todoElement.getAttribute('data-id');
+
+    if( elementName.includes('input') ) {
+        todoList.stateTodo( idTodo );
+        todoElement.classList.toggle('completed');
+    } else if ( elementName.includes('button') ) {
+        todoList.deleteTodo(idTodo);
+        divTodoList.removeChild( todoElement );
+    }
+
+    console.log(todoList);
+});
+
+buttonCompleted.addEventListener('click', () => {
+    todoList.deleteCompleteTasks();
+    for( let i = divTodoList.children.length - 1; i >= 0; i-- ) {
+        const element = divTodoList.children[i];
+        if( element.classList.contains('completed') ) {
+            divTodoList.removeChild(element);
+        }
+    } 
+});
+
+ulFilters.addEventListener('click', (event) => {
+    const filter = event.target.text;
+    if( !filter ) {return;}
+
+    anchorFilters.forEach( elem => elem.classList.remove('selected'));
+    event.target.classList.add('selected');
+
+    for( const element of divTodoList.children ) {
+        element.classList.remove('hidden');
+        const completed = element.classList.contains('completed');
+        switch( filter ) {
+            case 'Pendientes':
+                if( completed ) {
+                    element.classList.add('hidden');
+                }
+            break;
+
+            case 'Completados':
+                if( !completed ) {
+                    element.classList.add('hidden');
+                }
+            break;
+        }
     }
 });
